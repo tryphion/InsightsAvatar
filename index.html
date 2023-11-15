@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights Avatar Creator</title>
+    <link rel="stylesheet" type="text/css" href="..\css\styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Insights Avatar Creator</h1>
+    <form id="colorForm">
+        <label for="color1">Color 1 (Blue):</label>
+        <input type="color" id="color1" value="#007ac3">
+        <label for="percentage1">Value:</label>
+        <input type="number" id="percentage1" min="0" max="100" value="25">
+
+        <label for="color2">Color 2 (Green):</label>
+        <input type="color" id="color2" value="#7da42d">
+        <label for="percentage2">Value:</label>
+        <input type="number" id="percentage2" min="0" max="100" value="25">
+
+        <label for="color3">Color 3 (Yellow):</label>
+        <input type="color" id="color3" value="#f7cc5f">
+        <label for="percentage3">Value:</label>
+        <input type="number" id="percentage3" min="0" max="100" value="25">
+
+        <label for="color4">Color 4 (Red):</label>
+        <input type="color" id="color4" value="#b83636">
+        <label for="percentage4">Value:</label>
+        <input type="number" id="percentage4" min="0" max="100" value="25">
+
+        <label for="imageUpload">Upload an Image:</label>
+        <input type="file" id="imageUpload" accept="image/*">
+        <button type="button" onclick="generatePieChart()">Generate</button>
+    </form>
+
+    <canvas id="pieChartCanvas"></canvas>
+</div>
+    <script>
+    function generatePieChart() {
+        // Get the selected image file
+        const imageUpload = document.getElementById("imageUpload");
+        const imageFile = imageUpload.files[0];
+
+        if (!imageFile) {
+            alert("Please select an image.");
+            return;
+        }
+
+        const image = new Image();
+        image.src = URL.createObjectURL(imageFile);
+
+        image.onload = () => {
+            const canvas = document.getElementById("pieChartCanvas");
+            const targetSize = 700; // Desired size for the rescaled image
+            const extraSize = targetSize * 0.1; // 10% extra size for the pie chart
+
+            // Determine the dimensions of the rescaled image while maintaining the aspect ratio
+            let newWidth, newHeight;
+            if (image.width > image.height) {
+                newWidth = targetSize;
+                newHeight = (image.height / image.width) * targetSize;
+            } else {
+                newWidth = (image.width / image.height) * targetSize;
+                newHeight = targetSize;
+            }
+
+            // Set canvas dimensions including the extra size for the pie chart
+            canvas.width = (newWidth + extraSize);
+            canvas.height = (newHeight + extraSize);
+
+            const context = canvas.getContext("2d");
+            const centerX = (newWidth + extraSize) / 2;
+            const centerY = (newHeight + extraSize) / 2;
+            const pieChartRadius = (Math.min(newWidth, newHeight) / 2) * 1.1; // Radius based on rescaled image size
+
+            const colorInputs = [
+                document.getElementById("color1"),
+                document.getElementById("color2"),
+                document.getElementById("color3"),
+                document.getElementById("color4")
+            ];
+            const valueInputs = [
+                parseFloat(document.getElementById("percentage1").value),
+                parseFloat(document.getElementById("percentage2").value),
+                parseFloat(document.getElementById("percentage3").value),
+                parseFloat(document.getElementById("percentage4").value)
+            ];
+
+            // Combine colors and values, and sort them in descending order of values
+            const data = colorInputs.map((color, index) => ({ color: color.value, value: valueInputs[index] }));
+            data.sort((a, b) => b.value - a.value);
+
+            // Calculate the total sum of values
+            const totalValue = data.reduce((total, item) => total + item.value, 0);
+
+            if (totalValue === 0) {
+                alert("Please enter non-zero values.");
+                return;
+            }
+
+            const totalSections = colorInputs.length;
+            let startAngle = (-90 * Math.PI) / 180; // Start at 12 o'clock position (adjusted for canvas rotation)
+
+            // Clear the canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < totalSections; i++) {
+                const color = data[i].color;
+                const value = data[i].value;
+
+                const percentage = (value / totalValue) * 100; // Normalize to percentage
+
+                const endAngle = startAngle + (percentage / 100) * Math.PI * 2;
+
+                // Draw a pie slice with the specified color
+                context.beginPath();
+                context.moveTo(centerX, centerY);
+                context.arc(centerX, centerY, pieChartRadius, startAngle, endAngle);
+                context.closePath();
+                context.fillStyle = color;
+                context.fill();
+
+                startAngle = endAngle;
+            }
+
+            // Create a circular cutout of the uploaded image
+            context.save();
+            context.beginPath();
+            context.arc(centerX, centerY, pieChartRadius * 0.9, 0, Math.PI * 2); // Make the radius 10% smaller
+            context.clip();
+
+            // Calculate the position and size of the image to fit within the circular cutout
+            const imageAspectRatio = image.width / image.height;
+            const cutoutWidth = pieChartRadius * 2 * 0.9; // Make it 10% smaller
+            const cutoutHeight = cutoutWidth / imageAspectRatio;
+            const cutoutX = centerX - cutoutWidth / 2;
+            const cutoutY = centerY - cutoutHeight / 2;
+
+            context.drawImage(image, cutoutX, cutoutY, cutoutWidth, cutoutHeight);
+            context.restore();
+        };
+    }
+</script>
+
+</body>
+</html>
