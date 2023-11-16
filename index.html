@@ -56,15 +56,19 @@
             const targetSize = 700; // Desired size for the rescaled image
             const extraSize = targetSize * 0.1; // 10% extra size for the pie chart
 
-            // Determine the dimensions of the rescaled image while maintaining the aspect ratio
-            let newWidth, newHeight;
-            if (image.width > image.height) {
-                newWidth = targetSize;
-                newHeight = (image.height / image.width) * targetSize;
-            } else {
-                newWidth = (image.width / image.height) * targetSize;
-                newHeight = targetSize;
-            }
+            /let newWidth, newHeight, offsetX = 0, offsetY = 0;
+    if (image.width > image.height) {
+        // Landscape orientation: make width equal to height
+        newWidth = newHeight = image.height;
+        offsetX = (image.width - image.height) / 2; // Calculate offset for width
+    } else if (image.height > image.width) {
+        // Portrait orientation: make height equal to width
+        newWidth = newHeight = image.width;
+        offsetY = (image.height - image.width) / 2; // Calculate offset for height
+    } else {
+        // Already a square
+        newWidth = newHeight = image.width;
+    }
 
             // Set canvas dimensions including the extra size for the pie chart
             canvas.width = (newWidth + extraSize);
@@ -138,7 +142,7 @@
             const cutoutX = centerX - cutoutWidth / 2;
             const cutoutY = centerY - cutoutHeight / 2;
 
-            context.drawImage(image, cutoutX, cutoutY, cutoutWidth, cutoutHeight);
+            context.drawImage(image, offsetX, offsetY, newWidth, newHeight, cutoutX, cutoutY, cutoutWidth, cutoutHeight);
             context.restore();
         };
     }
