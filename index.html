@@ -54,7 +54,7 @@
         image.onload = () => {
             const canvas = document.getElementById("pieChartCanvas");
             const targetSize = 700; // Desired size for the rescaled image
-            const extraSize = targetSize * 0.1; // 10% extra size for the pie chart
+            const extraSize = targetSize * 0; // 10% extra size for the pie chart
 
             // Determine the dimensions of the rescaled image while maintaining the aspect ratio
             let newWidth, newHeight;
@@ -73,7 +73,7 @@
             const context = canvas.getContext("2d");
             const centerX = (newWidth + extraSize) / 2;
             const centerY = (newHeight + extraSize) / 2;
-            const pieChartRadius = (Math.max(newWidth, newHeight) / 2) * 1.1; // Radius based on rescaled image size
+            const pieChartRadius = (Math.min(newWidth, newHeight) / 2) * 1.1; // Radius based on rescaled image size
 
             const colorInputs = [
                 document.getElementById("color1"),
