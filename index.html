@@ -74,6 +74,7 @@
             const centerX = (newWidth + extraSize) / 2;
             const centerY = (newHeight + extraSize) / 2;
             const pieChartRadius = (Math.min(newWidth, newHeight) / 2) * 1.1; // Radius based on rescaled image size
+            const cutOutRadius = (Math.min(newWidth, newHeight) / 2);
 
             const colorInputs = [
                 document.getElementById("color1"),
@@ -128,12 +129,12 @@
             // Create a circular cutout of the uploaded image
             context.save();
             context.beginPath();
-            context.arc(centerX, centerY, pieChartRadius * 0.9, 0, Math.PI * 2); // Make the radius 10% smaller
+            context.arc(centerX, centerY, cutOutRadius * 0.9, 0, Math.PI * 2); // Make the radius 10% smaller
             context.clip();
 
             // Calculate the position and size of the image to fit within the circular cutout
             const imageAspectRatio = image.width / image.height;
-            const cutoutWidth = pieChartRadius * 2 * 0.9; // Make it 10% smaller
+            const cutoutWidth = cutOutRadius * 2 * 0.9; // Make it 10% smaller
             const cutoutHeight = cutoutWidth / imageAspectRatio;
             const cutoutX = centerX - cutoutWidth / 2;
             const cutoutY = centerY - cutoutHeight / 2;
