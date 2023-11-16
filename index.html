@@ -73,7 +73,7 @@
             const context = canvas.getContext("2d");
             const centerX = (newWidth + extraSize) / 2;
             const centerY = (newHeight + extraSize) / 2;
-            const pieChartRadius = (Math.min(newWidth, newHeight) / 2) * 1.1; // Radius based on rescaled image size
+            const pieChartRadius = (Math.max(newWidth, newHeight) / 2) * 1.1; // Radius based on rescaled image size
 
             const colorInputs = [
                 document.getElementById("color1"),
